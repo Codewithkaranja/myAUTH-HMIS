@@ -6,14 +6,15 @@ const cors = require("cors");
 const protect = require("./middleware/authMiddleware");
 
 const authRoutes = require("./routes/authRoutes");
-
 const app = express();
 
 // ---------- ENV VALIDATION ----------
 const requiredEnvs = ["MONGO_URI", "JWT_SECRET", "CLIENT_URL"];
 const missing = requiredEnvs.filter((k) => !process.env[k]);
-if (missing.length) console.warn("⚠️ Missing env vars:", missing.join(", "));
-else console.log("✅ All required env vars present.");
+if (missing.length)
+  console.warn("⚠️ Missing env vars:", missing.join(", "));
+else
+  console.log("✅ All required env vars present.");
 
 // ---------- MIDDLEWARE ----------
 app.use(express.json());
@@ -28,11 +29,11 @@ app.use((req, res, next) => {
 
 // ---------- CORS ----------
 const allowedOrigins = [
-  process.env.CLIENT_URL, // your GitHub Pages frontend
+  process.env.CLIENT_URL, // GitHub Pages frontend
   "http://127.0.0.1:5500", // local dev
   "http://localhost:5500", // local dev
-  "https://codewithkaranja.github.io", // fallback for GitHub Pages
-  "https://lunar-hmis-frontend.onrender.com", // ✅ your HMIS frontend
+  "https://codewithkaranja.github.io", // fallback
+  "https://lunar-hmis-frontend.onrender.com", // HMIS frontend
 ];
 
 app.use(
@@ -45,14 +46,24 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
 // ---------- DATABASE ----------
 const connectDB = async () => {
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    console.error("❌ MONGO_URI is missing from environment variables!");
+    return;
+  }
+
   try {
     console.log("🔗 Connecting to MongoDB...");
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("✅ MongoDB connected successfully");
   } catch (err) {
     console.error("❌ MongoDB connection error:", err.message);

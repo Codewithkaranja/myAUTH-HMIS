@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const protect = require("./middleware/authMiddleware");
 
-const authRoutes = require("./routes/authRoutes"); // <- use local routes
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -28,18 +28,21 @@ app.use((req, res, next) => {
 
 // ---------- CORS ----------
 const allowedOrigins = [
-  process.env.CLIENT_URL,
-  "http://127.0.0.1:5500",
-  "http://localhost:5500",
-  "https://codewithkaranja.github.io",
+  process.env.CLIENT_URL, // your GitHub Pages frontend
+  "http://127.0.0.1:5500", // local dev
+  "http://localhost:5500", // local dev
+  "https://codewithkaranja.github.io", // fallback for GitHub Pages
+  "https://lunar-hmis-frontend.onrender.com", // ✅ your HMIS frontend
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
       console.warn(`🚫 Blocked CORS origin: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
@@ -59,23 +62,23 @@ const connectDB = async () => {
 connectDB();
 
 // ---------- ROUTES ----------
-app.use("/api/auth", authRoutes); // use local auth routes
+app.use("/api/auth", authRoutes);
 
 // Example of using protected route
 app.get("/api/protected", protect, (req, res) => {
   res.json({ message: "🔒 Protected route access granted", user: req.user });
 });
 
-// Health checks
-app.get("/", (req, res) => res.send("🚀 MyAuth Server running..."));
+// ---------- HEALTH CHECKS ----------
+app.get("/", (req, res) => res.send("🚀 MyAuth-HMIS Server running..."));
 app.get("/api", (req, res) => res.send("✅ API root is alive"));
 
-// 404 HANDLER
+// ---------- 404 HANDLER ----------
 app.use((req, res) => {
   res.status(404).json({ message: "❌ Route not found" });
 });
 
-// START SERVER
+// ---------- START SERVER ----------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);

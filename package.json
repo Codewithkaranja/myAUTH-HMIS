@@ -1,12 +1,16 @@
 {
   "name": "@charleskaranja/myauth",
   "version": "1.0.0",
-  "description": "Custom authentication module with email verification",
+  "description": "Custom authentication module with email verification and JWT tokens",
   "main": "index.js",
   "author": "Charles Karanja",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",

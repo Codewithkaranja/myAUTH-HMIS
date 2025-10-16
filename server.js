@@ -28,11 +28,14 @@ app.use((req, res, next) => {
 });
 
 // ---------- CORS ----------
+// ---------- CORS ----------
 const allowedOrigins = [
   process.env.CLIENT_URL, // GitHub Pages frontend
-  "http://127.0.0.1:5500", // local dev
-  "http://localhost:5500", // local dev
-  "https://codewithkaranja.github.io", // fallback
+  "http://127.0.0.1:5500", // local dev (VS Code)
+  "http://localhost:5500", // local dev (VS Code)
+  "http://127.0.0.1:5501", // ✅ added for Live Server alt port
+  "http://localhost:5501",  // ✅ added for Live Server alt port
+  "https://codewithkaranja.github.io", // GitHub fallback
   "https://lunar-hmis-frontend.onrender.com", // HMIS frontend
 ];
 
@@ -46,7 +49,6 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
